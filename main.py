@@ -75,4 +75,4 @@ def main():
     predictors = list(selected_cols[sfs.get_support()])
     
     if __name__ == "__main__":
-    main()
+        main()
