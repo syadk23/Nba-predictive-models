@@ -8,3 +8,8 @@ List of models being/will be implemented
 - Game Predictor (WIP)
 - MVP Predictor (To be implemented)
 - NBA Champs Predictor (To be implemented)
+
+
+# Requirements
+
+- Must install scikit

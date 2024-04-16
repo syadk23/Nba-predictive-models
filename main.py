@@ -1,4 +1,8 @@
 from nba_api.stats.endpoints import leaguedashplayerstats
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.linear_model import RidgeClassifier
+from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 import pprint
 
@@ -35,32 +39,40 @@ def get_mvp_winners():
     }
     return mvp_winners
 
+def add_target(team):
+    team['target'] = team['won'].shift(-1)
+    return team
+
 def main():
     start_year = 2012
     end_year = 2023
     seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
 
-    all_basic_stats = {}
-    all_advanced_stats = {}
-    mvp_stats = {}
-    for season in seasons:
-        all_basic_stats[season] = get_player_stats(season)
-        #all_advanced_stats[season] = get_player_advanced_stats(season)
+    # data processing
+    df = pd.read_csv('data/nba_games.csv')
+    df = df.groupby('team', group_keys=False).apply(add_target)
+    df['target'][pd.isnull(df['target'])] = 2
+    df['target'] = df['target'].astype(int, errors='ignore')
 
-    #print(all_advanced_stats['2022-23'])
-    mvp_winners = get_mvp_winners()
+    nulls = pd.isnull(df)
+    nulls = nulls.sum()
+    nulls = nulls[nulls > 0]
 
-    for year, winner in mvp_winners.items():
-        if winner in all_basic_stats[year]['PLAYER_NAME'].values:
-            mvp_stats[year] = get_player_avg_stats(all_basic_stats[year], winner)
-        else:
-            print(winner, "stats were not found for the year", year)
+    valid_cols = df.columns[~df.columns.isin(nulls.index)]
+    df = df[valid_cols].copy()
 
-    pprint.pprint(mvp_stats)
-    player_stats = get_player_stats(seasons[-1])
+    # machine learning
+    rr = RidgeClassifier(alpha=1)
+    split = TimeSeriesSplit(n_splits=3)
+    sfs = SequentialFeatureSelector(rr, n_features_to_select=30, direction='forward', cv=split)
+    scaler = MinMaxScaler()
 
-    #player_avg_stats = get_player_avg_stats(player_stats).sort_values(by='PTS', ascending = False)
-    #print(player_avg_stats)
+    removed_cols =  ['season', 'date', 'won', 'target', 'team', 'team_opp']
+    selected_cols = df.columns[~df.columns.isin(removed_cols)]
+    df[selected_cols] = scaler.fit_transform(df[selected_cols])
 
-if __name__ == "__main__":
+    sfs.fit(df[selected_cols], df['target'])
+    predictors = list(selected_cols[sfs.get_support()])
+    
+    if __name__ == "__main__":
     main()
