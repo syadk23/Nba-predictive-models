@@ -43,6 +43,27 @@ def add_target(team):
     team['target'] = team['won'].shift(-1)
     return team
 
+def backtest(data, model, predictors, start=2, step=1):
+    all_predictions = []
+    seasons = sorted(data['season'].unique())
+    for i in range(start, len(seasons), step):
+        season = seasons[i]
+
+        train = data[data['season'] < season]
+        test = data[data['season'] == season]
+
+        model.fit(train[predictors], train['target'])
+
+        preds = model.predict(test[predictors])
+        preds = pd.Series(preds, index=test.index)
+
+        combined = pd.concat([test['target'], preds], axis=1)
+        combined.columns = ['actual', 'predictions']
+        
+        all_predictions.append(combined)
+    
+    return pd.concat(all_predictions)
+
 def main():
     start_year = 2012
     end_year = 2023
@@ -73,6 +94,8 @@ def main():
 
     sfs.fit(df[selected_cols], df['target'])
     predictors = list(selected_cols[sfs.get_support()])
+    predictions = backtest(df, rr, predictors)
+    print(predictions)
     
     if __name__ == "__main__":
         main()
