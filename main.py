@@ -3,6 +3,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.linear_model import RidgeClassifier
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import accuracy_score
 import pandas as pd
 import pprint
 
@@ -64,6 +65,10 @@ def backtest(data, model, predictors, start=2, step=1):
     
     return pd.concat(all_predictions)
 
+def find_team_averages(team):
+    rolling = team.rolling(10).mean()
+    return rolling
+
 def main():
     start_year = 2012
     end_year = 2023
@@ -95,7 +100,14 @@ def main():
     sfs.fit(df[selected_cols], df['target'])
     predictors = list(selected_cols[sfs.get_support()])
     predictions = backtest(df, rr, predictors)
-    print(predictions)
+    predictions = predictions[predictions['actual'] != 2]
     
-    if __name__ == "__main__":
-        main()
+    print(accuracy_score(predictions['actual'], predictions['predictions']))
+    print(df.groupby('home').apply(lambda x: x[x['won'] == 1].shape[0] / x.shape[0]))
+
+    df_rolling = df[list(selected_cols) + ['won', 'team', 'season']]
+    df_rolling = df_rolling.groupby(['team', 'season'], group_keys=False).apply(find_team_averages)
+    print(df_rolling)
+
+if __name__ == '__main__':
+    main()
