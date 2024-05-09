@@ -66,8 +66,15 @@ def backtest(data, model, predictors, start=2, step=1):
     return pd.concat(all_predictions)
 
 def find_team_averages(team):
-    rolling = team.rolling(10).mean()
+    rolling = team.loc[:, team.columns != 'team'].rolling(10).mean()
     return rolling
+
+def shift_col(team, col_name):
+    next_col = team[col_name].shift(-1)
+    return next_col
+
+def add_col(df, col_name):
+    return df.groupby('team', group_keys=False).apply(lambda x: shift_col(x, col_name))
 
 def main():
     start_year = 2012
@@ -102,12 +109,26 @@ def main():
     predictions = backtest(df, rr, predictors)
     predictions = predictions[predictions['actual'] != 2]
     
-    print(accuracy_score(predictions['actual'], predictions['predictions']))
-    print(df.groupby('home').apply(lambda x: x[x['won'] == 1].shape[0] / x.shape[0]))
+    #print(accuracy_score(predictions['actual'], predictions['predictions']))
+    #print(df.groupby('home').apply(lambda x: x[x['won'] == 1].shape[0] / x.shape[0]))
 
     df_rolling = df[list(selected_cols) + ['won', 'team', 'season']]
     df_rolling = df_rolling.groupby(['team', 'season'], group_keys=False).apply(find_team_averages)
-    print(df_rolling)
+
+    rolling_cols = [f'{col}_rolling10' for col in df_rolling.columns]
+    df_rolling.columns = rolling_cols
+    
+    df = pd.concat([df, df_rolling], axis=1)
+    df = df.dropna()
+
+    df['home_next'] = add_col(df, 'home')
+    df['team_opp_next'] = add_col(df, 'team_opp')
+    df['date_next'] = add_col(df, 'date')
+    df = df.copy()
+
+    full_df = df.merge(df[rolling_cols + ['team_opp_next', 'date_next', 'team']], left_on=['team', 'date_next'], right_on=['team_opp_next', 'date_next'])
+    print(full_df)
+    
 
 if __name__ == '__main__':
     main()
