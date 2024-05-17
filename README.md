@@ -5,8 +5,9 @@ Uses nba_api and basketball reference for data
 
 List of models being/will be implemented
 
-- Game Predictor (WIP)
-- MVP Predictor (To be implemented)
+- ~~Previous Game Predictor~~
+- MVP Predictor (WIP)
+- Future Game Predictor (To be implemented)
 - NBA Champs Predictor (To be implemented)
 
 
