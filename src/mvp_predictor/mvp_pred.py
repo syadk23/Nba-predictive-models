@@ -19,17 +19,17 @@ def get_player_avg_stats(stats, player_name=None):
 def get_mvp_winners():
     # Use last 10 as testing for now
     mvp_winners = {
-        '2023-24': 'Nikola Jokic',
-        '2022-23': 'Joel Embiid',
-        '2021-22': 'Nikola Jokic',
-        '2020-21': 'Nikola Jokic',
-        '2019-20': 'Giannis Antetokounmpo',
-        '2018-19': 'Giannis Antetokounmpo',
-        '2017-18': 'James Harden',
-        '2016-17': 'Russell Westbrook',
-        '2015-16': 'Stephen Curry',
-        '2014-15': 'Stephen Curry',
-        '2013-14': 'Kevin Durant',
-        '2012-13': 'LeBron James'
+        '2023-24': 'NIKOLA JOKIC',
+        '2022-23': 'JOEL EMBIID',
+        '2021-22': 'NIKOLA JOKIC',
+        '2020-21': 'NIKOLA JOKIC',
+        '2019-20': 'GIANNIS ANTETOKOUNMPO',
+        '2018-19': 'GIANNIS ANTETOKOUNMPO',
+        '2017-18': 'JAMES HARDEN',
+        '2016-17': 'RUSSELL WESTBROOK',
+        '2015-16': 'STEPHEN CURRY',
+        '2014-15': 'STEPHEN CURRY',
+        '2013-14': 'KEVIN DURANT',
+        '2012-13': 'LEBRON JAMES'
     }
     return mvp_winners

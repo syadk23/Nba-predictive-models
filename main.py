@@ -9,6 +9,7 @@ from src.nba_game_predictor.game_pred import *
 from src.mvp_predictor.mvp_pred import *
 import pandas as pd
 import numpy as np
+from collections import defaultdict
 
 def game_prediction():
     # data processing
@@ -56,17 +57,17 @@ def game_prediction():
     df['date_next'] = add_col(df, 'date')
     df = df.copy()
 
-    full_df = df.merge(df[rolling_cols + ['team_opp_next', 'date_next', 'team']], left_on=['team', 'date_next'], right_on=['team_opp_next', 'date_next'])
+    df_full = df.merge(df[rolling_cols + ['team_opp_next', 'date_next', 'team']], left_on=['team', 'date_next'], right_on=['team_opp_next', 'date_next'])
 
-    removed_cols = list(full_df.columns[full_df.dtypes == 'object']) + removed_cols
-    selected_cols = full_df.columns[~full_df.columns.isin(removed_cols)]
+    removed_cols = list(df_full.columns[df_full.dtypes == 'object']) + removed_cols
+    selected_cols = df_full.columns[~df_full.columns.isin(removed_cols)]
    
     # machine learning
-    sfs.fit(full_df[selected_cols], full_df['target'])
+    sfs.fit(df_full[selected_cols], df_full['target'])
     predictors = list(selected_cols[sfs.get_support()])
-    predictions = backtest(full_df, rr, predictors)
+    predictions = backtest(df_full, rr, predictors)
 
-    #print(full_df.groupby('home').apply(lambda x: x[x['won'] == 1].shape[0] / x.shape[0])) # Final model ~ 57% accurate 
+    #print(df_full.groupby('home').apply(lambda x: x[x['won'] == 1].shape[0] / x.shape[0])) # Final model ~ 57% accurate 
 
     return predictions
   
@@ -77,39 +78,39 @@ def main():
     seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
 
     mvp_winners = get_mvp_winners()
+    df_full = pd.DataFrame()
 
     #pd.set_option('display.max_columns', None)
 
     for season in seasons:
-        df = get_player_stats(season)
+        df_basic = get_player_stats(season)
         df_advanced_stats = get_player_advanced_stats(season)
 
-        df.insert(len(df.columns), 'COUNTING_STATS', df['PTS'] + df['REB'] + df['AST'])
+        df_basic.insert(len(df_basic.columns), 'COUNTING_STATS', df_basic['PTS'] + df_basic['REB'] + df_basic['AST'])
+
         removed_cols = []
         remove_string = 'RANK'
-        for col in df.columns:
+        for col in df_basic.columns:
             if remove_string in col:
                 removed_cols.append(col)
-
         removed_cols.append('WNBA_FANTASY_PTS')
         removed_cols.append('NICKNAME')
-        selected_cols = df.columns[~df.columns.isin(removed_cols)]
-        df = df[selected_cols]
+
+        selected_cols = df_basic.columns[~df_basic.columns.isin(removed_cols)]
+        df_basic = df_basic[selected_cols]
 
         selected_cols_df_advanced_stats = ['PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'AGE', 'GP', 'W', 'L', 'W_PCT', 'MIN', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'TS_PCT', 'USG_PCT', 'PIE']
         df_advanced_stats = df_advanced_stats[selected_cols_df_advanced_stats]
         
         # IF COUNTING STATS ARE < 30 or games played is < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
-        df = df.drop(df[df['COUNTING_STATS'] < 30.0].index)
-        df = df.drop(df[df['GP'] < 30].index)
+        df_basic = df_basic.drop(df_basic[df_basic['COUNTING_STATS'] < 30.0].index)
+        df_basic = df_basic.drop(df_basic[df_basic['GP'] < 30].index)
 
-        full_df = pd.merge(df, df_advanced_stats, how='inner')
-        full_df.insert(4, 'SEASON', season)
-        #print(full_df['PLAYER_NAME'].values)
-        full_df.insert(len(full_df.columns), 'WON_MVP', (1 if full_df['PLAYER_NAME'].values[i] in mvp_winners[season] else 0 for i in df['PLAYER_NAME']))  # set to 1 if the person won mvp that given season *TODO
-        print(full_df)
-
-    
+        df_season = pd.merge(df_basic, df_advanced_stats, how='inner')
+        df_season.insert(5, 'SEASON', season)
+        df_season.insert(len(df_season.columns), 'WON_MVP', 0)
+        df_season['WON_MVP'] = df_season['PLAYER_NAME'].apply(lambda str: str.upper() in mvp_winners[season]).map({True: 1, False: 0})
+  
 
 
     #game_pred_model_predictions = game_prediction()
