@@ -72,33 +72,44 @@ def game_prediction():
   
      
 def main():
-    start_year = 2012
+    start_year = 2018
     end_year = 2023
     seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
 
-    df = get_player_stats('2012-13')
-    df1 = pd.read_csv(('data/player_mvp_stats.csv'))
-    
+    mvp_winners = get_mvp_winners()
+
     #pd.set_option('display.max_columns', None)
 
-    df.insert(len(df.columns), 'COUNTING_STATS', df['PTS'] + df['REB'] + df['AST'])
-    removed_cols = []
-    remove_string = 'RANK'
-    for col in df.columns:
-        if remove_string in col:
-            removed_cols.append(col)
+    for season in seasons:
+        df = get_player_stats(season)
+        df_advanced_stats = get_player_advanced_stats(season)
 
-    removed_cols.append('WNBA_FANTASY_PTS')
-    removed_cols.append('NICKNAME')
-    selected_cols = df.columns[~df.columns.isin(removed_cols)]
-    df = df[selected_cols]
+        df.insert(len(df.columns), 'COUNTING_STATS', df['PTS'] + df['REB'] + df['AST'])
+        removed_cols = []
+        remove_string = 'RANK'
+        for col in df.columns:
+            if remove_string in col:
+                removed_cols.append(col)
+
+        removed_cols.append('WNBA_FANTASY_PTS')
+        removed_cols.append('NICKNAME')
+        selected_cols = df.columns[~df.columns.isin(removed_cols)]
+        df = df[selected_cols]
+
+        selected_cols_df_advanced_stats = ['PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'AGE', 'GP', 'W', 'L', 'W_PCT', 'MIN', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'TS_PCT', 'USG_PCT', 'PIE']
+        df_advanced_stats = df_advanced_stats[selected_cols_df_advanced_stats]
+        
+        # IF COUNTING STATS ARE < 30 or games played is < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
+        df = df.drop(df[df['COUNTING_STATS'] < 30.0].index)
+        df = df.drop(df[df['GP'] < 30].index)
+
+        full_df = pd.merge(df, df_advanced_stats, how='inner')
+        full_df.insert(4, 'SEASON', season)
+        #print(full_df['PLAYER_NAME'].values)
+        full_df.insert(len(full_df.columns), 'WON_MVP', (1 if full_df['PLAYER_NAME'].values[i] in mvp_winners[season] else 0 for i in df['PLAYER_NAME']))  # set to 1 if the person won mvp that given season *TODO
+        print(full_df)
+
     
-    # IF COUNTING STATS ARE < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
-    df = df.drop(df[df['COUNTING_STATS'] < 30.0].index)
-
-    print(df)
-
-
 
 
     #game_pred_model_predictions = game_prediction()

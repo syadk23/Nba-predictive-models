@@ -19,6 +19,7 @@ def get_player_avg_stats(stats, player_name=None):
 def get_mvp_winners():
     # Use last 10 as testing for now
     mvp_winners = {
+        '2023-24': 'Nikola Jokic',
         '2022-23': 'Joel Embiid',
         '2021-22': 'Nikola Jokic',
         '2020-21': 'Nikola Jokic',
