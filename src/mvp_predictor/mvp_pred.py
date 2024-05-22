@@ -1,4 +1,8 @@
 import pandas as pd
+import xgboost as xgb
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score, roc_auc_score
 from nba_api.stats.endpoints import leaguedashplayerstats
 from collections import defaultdict
 
@@ -71,6 +75,29 @@ def mvp_predictions(start_year, end_year):
         df_season.insert(len(df_season.columns), 'WON_MVP', 0)
         df_season['WON_MVP'] = df_season['PLAYER_NAME'].apply(lambda str: str.upper() in mvp_winners[season]).map({True: 1, False: 0})
   
-        X, y = df_season.drop(columns=['WON_MVP']), df_season['WON_MVP']
+        X, y = df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']), df_season['WON_MVP']
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=6, random_state=42)
+        model.fit(X_train_scaled, y_train)
+
+        y_predict = model.predict(X_test_scaled)
+        y_predict_probs = model.predict_proba(X_test_scaled)[:, 1]
+
+        acc = accuracy_score(y_test, y_predict)
+
+        cur_season_scaled = scaler.transform(df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']))
+        cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1]
+
+        predicted_mvp_candidates = df_season.copy()
+        predicted_mvp_candidates['PREDICTED_PROBABILITY'] = cur_season_predictions * 100
+        predicted_mvp_candidates.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
+
+        print(predicted_mvp_candidates.head())
 
     return df_season
