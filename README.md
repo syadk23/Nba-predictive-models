@@ -12,5 +12,6 @@ List of models being/will be implemented
 
 
 # Requirements
-
 - Must install scikit
+- Must install XGBoost
+- Must install Pandas
