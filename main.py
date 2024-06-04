@@ -4,9 +4,9 @@ from src.mvp_predictor.mvp_pred import mvp_predictions
 import pandas as pd
   
 def main():
-    pd.set_option('display.max_columns', None)
+    #pd.set_option('display.max_columns', None)
 
-    df = mvp_predictions(start_year=2018, end_year=2023)
+    df = mvp_predictions(start_year=2013, end_year=2023)
     #print(df)
         
     """ game_pred_model_predictions = game_prediction()

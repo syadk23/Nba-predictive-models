@@ -1,7 +1,10 @@
 import pandas as pd
 import xgboost as xgb
+import numpy as np
+from matplotlib import pyplot
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score, roc_auc_score
 from nba_api.stats.endpoints import leaguedashplayerstats
 from collections import defaultdict
@@ -44,7 +47,6 @@ def mvp_predictions(start_year, end_year):
     seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
 
     mvp_winners = get_mvp_winners()
-    df_full = pd.DataFrame()
 
     for season in seasons:
         df_basic = get_player_stats(season)
@@ -83,8 +85,11 @@ def mvp_predictions(start_year, end_year):
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
-        model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.1, max_depth=6, random_state=42)
+        model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.01, max_depth=6, random_state=42)
         model.fit(X_train_scaled, y_train)
+
+        regr = RandomForestRegressor(max_depth=2, random_state=0)
+        regr.fit(X_train, y_train)
 
         y_predict = model.predict(X_test_scaled)
         y_predict_probs = model.predict_proba(X_test_scaled)[:, 1]
@@ -94,10 +99,18 @@ def mvp_predictions(start_year, end_year):
         cur_season_scaled = scaler.transform(df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']))
         cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1]
 
-        predicted_mvp_candidates = df_season.copy()
-        predicted_mvp_candidates['PREDICTED_PROBABILITY'] = cur_season_predictions * 100
-        predicted_mvp_candidates.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
+        regr_seasons_predictions = regr.predict(X)
 
-        print(predicted_mvp_candidates.head())
+        df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
+        prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
+
+        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100
+        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
+
+        feat_imp = model.get_booster().get_score(importance_type='weight')
+        print(feat_imp)
+
+        #print(df_season)
+        print(df_season[['PLAYER_NAME', 'SEASON', 'PREDICTED_PROBABILITY']])
 
     return df_season
