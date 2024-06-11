@@ -26,7 +26,6 @@ def get_player_avg_stats(stats, player_name=None):
     return player_avg_stats
 
 def get_mvp_winners():
-    # Use last 10 as testing for now
     mvp_winners = {
         '2023-24': 'NIKOLA JOKIC',
         '2022-23': 'JOEL EMBIID',
@@ -39,11 +38,44 @@ def get_mvp_winners():
         '2015-16': 'STEPHEN CURRY',
         '2014-15': 'STEPHEN CURRY',
         '2013-14': 'KEVIN DURANT',
-        '2012-13': 'LEBRON JAMES'
+        '2012-13': 'LEBRON JAMES',
+        '2011-12': 'LEBRON JAMES',
+        '2010-11': 'DERRICK ROSE',
+        '2009-10': 'LEBRON JAMES',
+        '2008-09': 'LEBRON JAMES',
+        '2007-08': 'KOBE BRYANT',
+        '2006-07': 'DIRK NOWITZKI',
+        '2005-06': 'STEVE NASH',
+        '2004-05': 'STEVE NASH',
+        '2003-04': 'KEVIN GARNETT',
+        '2002-03': 'TIM DUNCAN',
+        '2001-02': 'TIM DUNCAN',
+        '2000-01': 'ALLEN IVERSON',
+        '1999-00': 'SHAQUILLE O\'NEAL',
+        '1998-99': 'KARL MALONE',
+        '1997-98': 'MICHAEL JORDAN',
+        '1996-97': 'KARL MALONE',
+        '1995-96': 'MICHAEL JORDAN',
+        '1994-95': 'DAVID ROBINSON',
+        '1993-94': 'HAKEEM OLAJUWON',
+        '1992-93': 'CHARLES BARKLEY',
+        '1991-92': 'MICHAEL JORDAN',
+        '1990-91': 'MICHAEL JORDAN',
+        '1989-90': 'MAGIC JOHNSON',
+        '1988-89': 'MAGIC JOHNSON',
+        '1987-88': 'MICHAEL JORDAN',
+        '1986-87': 'MAGIC JOHNSON'
     }
     return mvp_winners
 
 def mvp_predictions(start_year, end_year):
+    if start_year < 1986 or start_year > 2023:
+        print('Invalid season, there are no stats available for seasons:', start_year)
+        return
+    if end_year < 1986 or end_year > 2023:
+        print('Invalid season, there are no stats available for seasons:', end_year)
+        return
+
     seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
 
     mvp_winners = get_mvp_winners()
@@ -81,36 +113,34 @@ def mvp_predictions(start_year, end_year):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        scaler = StandardScaler()
+        """ scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
         X_test_scaled = scaler.transform(X_test)
 
         model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.01, max_depth=6, random_state=42)
         model.fit(X_train_scaled, y_train)
-
+ """
         regr = RandomForestRegressor(max_depth=2, random_state=0)
-        regr.fit(X_train, y_train)
+        regr.fit(X, y)
 
-        y_predict = model.predict(X_test_scaled)
+        """ y_predict = model.predict(X_test_scaled)
         y_predict_probs = model.predict_proba(X_test_scaled)[:, 1]
 
         acc = accuracy_score(y_test, y_predict)
 
         cur_season_scaled = scaler.transform(df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']))
-        cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1]
+        cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1] """
 
         regr_seasons_predictions = regr.predict(X)
 
         df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
         prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
 
-        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100
+        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100 if prob_sum > 0 else 0
         df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
 
-        feat_imp = model.get_booster().get_score(importance_type='weight')
-        print(feat_imp)
+        feat_imp = regr.feature_importances_
+        #print(feat_imp)
 
-        #print(df_season)
-        print(df_season[['PLAYER_NAME', 'SEASON', 'PREDICTED_PROBABILITY']])
-
-    return df_season
+        print(df_season)
+        #print(df_season[['PLAYER_NAME', 'SEASON', 'PREDICTED_PROBABILITY', 'WON_MVP']])
