@@ -120,8 +120,8 @@ def mvp_predictions(start_year, end_year):
         model = xgb.XGBClassifier(n_estimators=100, learning_rate=0.01, max_depth=6, random_state=42)
         model.fit(X_train_scaled, y_train)
  """
-        regr = RandomForestRegressor(max_depth=2, random_state=0)
-        regr.fit(X, y)
+        regr = RandomForestRegressor(max_depth=3, random_state=42)
+        regr.fit(X_train, y_train)
 
         """ y_predict = model.predict(X_test_scaled)
         y_predict_probs = model.predict_proba(X_test_scaled)[:, 1]
@@ -132,15 +132,16 @@ def mvp_predictions(start_year, end_year):
         cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1] """
 
         regr_seasons_predictions = regr.predict(X)
+        print(regr_seasons_predictions)
 
-        df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
+        """ df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
         prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
 
         df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100 if prob_sum > 0 else 0
-        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
+        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True) """
 
         feat_imp = regr.feature_importances_
         #print(feat_imp)
 
-        print(df_season)
+        #print(df_season)
         #print(df_season[['PLAYER_NAME', 'SEASON', 'PREDICTED_PROBABILITY', 'WON_MVP']])
