@@ -85,14 +85,13 @@ def mvp_predictions(start_year, end_year):
         df_advanced_stats = get_player_advanced_stats(season)
 
         df_basic.insert(len(df_basic.columns), 'COUNTING_STATS', df_basic['PTS'] + df_basic['REB'] + df_basic['AST'])
+        df_basic['COUNTING_STATS'] = df_basic['COUNTING_STATS'].apply(lambda x: round(x, 1))
+        df_basic['AGE'] = df_basic['AGE'].astype(int)
 
-        removed_cols = []
-        remove_string = 'RANK'
+        removed_cols = ['WNBA_FANTASY_PTS', 'NICKNAME']
         for col in df_basic.columns:
-            if remove_string in col:
+            if 'RANK' in col:
                 removed_cols.append(col)
-        removed_cols.append('WNBA_FANTASY_PTS')
-        removed_cols.append('NICKNAME')
 
         selected_cols = df_basic.columns[~df_basic.columns.isin(removed_cols)]
         df_basic = df_basic[selected_cols]
@@ -132,15 +131,22 @@ def mvp_predictions(start_year, end_year):
         cur_season_predictions = model.predict_proba(cur_season_scaled)[:, 1] """
 
         regr_seasons_predictions = regr.predict(X)
-        print(regr_seasons_predictions)
 
-        """ df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
+        df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
         prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
 
         df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100 if prob_sum > 0 else 0
-        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True) """
+        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
 
-        feat_imp = regr.feature_importances_
+        hide_cols = ['PLAYER_ID', 'TEAM_ID']
+        visible_cols = df_season.columns[~df_season.columns.isin(hide_cols)]
+        df_season = df_season[visible_cols]
+        return df_season
+
+
+
+
+        #feat_imp = regr.feature_importances_
         #print(feat_imp)
 
         #print(df_season)

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>NBA Machine Learning Model Predictors</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <div class="navbar">
+            <a href="{{ url_for('home') }}">Home</a>
+            <a href="{{ url_for('mvp_predictor') }}">MVP Predictor</a>
+            <a href="{{ url_for('game_predictor') }}">Game Predictor</a>
+        </div>
+
+        <div class="content">
+            <h1>Welcome to the NBA Prediction Site</h1>
+            <p>Select an option from the navbar to get started.</p>
+        </div>
+    </body>
+</html>
