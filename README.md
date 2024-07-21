@@ -15,3 +15,4 @@ List of models being/will be implemented
 - Must install scikit
 - Must install XGBoost
 - Must install Pandas
+- Must install Flask
