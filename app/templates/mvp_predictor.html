@@ -15,6 +15,15 @@
 
         <div class="content">
             <h1>MVP Predictor</h1>
+            <label for="year">Year:</label>
+            <select id="year" name="year" onchange="redirectToYear(this.value)">
+                <option value="" disabled>Select a year</option>
+                {% for year in range(2023, 1985, -1) %}
+                    <option value="{{ year+1 }}" {% if selected_year == year %} selected {% endif %}>{{ year }}-{{ year+1 }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <br>
             <table>
                 <thead>
                     <tr>
@@ -34,5 +43,13 @@
                 </tbody>
             </table>
         </div>
+
+        <script>
+            function redirectToYear(year) {
+                if (year) {
+                    window.location.href = "/mvp_predictor/" + (year);
+                }
+            }
+        </script>
     </body>
 </html>

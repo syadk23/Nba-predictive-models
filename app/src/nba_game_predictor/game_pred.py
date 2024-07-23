@@ -1,8 +1,8 @@
-import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.feature_selection import SequentialFeatureSelector
 from sklearn.linear_model import RidgeClassifier
 from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
 
 def add_target(team):
     team['target'] = team['won'].shift(-1)

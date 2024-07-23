@@ -1,30 +1,36 @@
-from flask import Flask, render_template
-import pandas as pd
+from flask import Flask, render_template, session, redirect, url_for
 from src.mvp_predictor.mvp_pred import mvp_predictions
+from datetime import datetime
+import pandas as pd
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-@app.route('/mvp_predictor')
+# Default to latest year 
+@app.route('/mvp_predictor/')
 def mvp_predictor():
-    """ # Example DataFrame
-    data = {
-        "Player": ["Player A", "Player B", "Player C"],
-        "Points": [30, 25, 20],
-        "Assists": [10, 7, 5],
-        "Rebounds": [8, 6, 10]
-    }
-    df = pd.DataFrame(data) """
-    
+    cur_year = datetime.now().year
     # Convert DataFrame to HTML
-    df = mvp_predictions(2023, 2023)
+    df = mvp_predictions(cur_year-1, cur_year-1)
     columns = df.columns.tolist()
     data = df.values.tolist()
 
-    return render_template('mvp_predictor.html', columns=columns, data=data)
+    return render_template('mvp_predictor.html', selected_year=cur_year-1, columns=columns, data=data)
+
+@app.route('/mvp_predictor/<int:year>')
+def mvp_predictor_year(year):
+    session['selected_year'] = year
+    # Convert DataFrame to HTML
+    df = mvp_predictions(year-1, year-1)
+    columns = df.columns.tolist()
+    data = df.values.tolist()
+
+    return render_template('mvp_predictor.html', selected_year=year-1, columns=columns, data=data)
 
 @app.route('/game_predictor')
 def game_predictor():

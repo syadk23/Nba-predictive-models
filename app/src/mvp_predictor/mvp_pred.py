@@ -1,6 +1,3 @@
-import pandas as pd
-import xgboost as xgb
-import numpy as np
 from matplotlib import pyplot
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -8,6 +5,9 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import accuracy_score, roc_auc_score
 from nba_api.stats.endpoints import leaguedashplayerstats
 from collections import defaultdict
+import pandas as pd
+import xgboost as xgb
+import numpy as np
 
 def get_player_stats(season):
     player_stats = leaguedashplayerstats.LeagueDashPlayerStats(season=season, per_mode_detailed='PerGame')
@@ -110,7 +110,7 @@ def mvp_predictions(start_year, end_year):
   
         X, y = df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']), df_season['WON_MVP']
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         """ scaler = StandardScaler()
         X_train_scaled = scaler.fit_transform(X_train)
@@ -120,7 +120,7 @@ def mvp_predictions(start_year, end_year):
         model.fit(X_train_scaled, y_train)
  """
         regr = RandomForestRegressor(max_depth=3, random_state=42)
-        regr.fit(X_train, y_train)
+        regr.fit(X, y)
 
         """ y_predict = model.predict(X_test_scaled)
         y_predict_probs = model.predict_proba(X_test_scaled)[:, 1]
@@ -136,6 +136,7 @@ def mvp_predictions(start_year, end_year):
         prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
 
         df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100 if prob_sum > 0 else 0
+        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'].apply(lambda x: round(x, 3))
         df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
 
         hide_cols = ['PLAYER_ID', 'TEAM_ID']

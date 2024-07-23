@@ -1,6 +1,6 @@
-import os
 from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeout
+import os
 import time
 
 SEASONS = list(range(2016,2023))

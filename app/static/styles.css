@@ -5,8 +5,7 @@ body {
 }
 
 .navbar {
-    width: 150px;
-    height: 100vh;
+    display: inline-block;
     flex-direction: column;
     background-color: #333;
     padding: 20px 0;
@@ -42,6 +41,12 @@ table, th, td {
 }
 
 th, td {
-    padding: 8px;
-    text-align: left;
+    padding: 4px;
+    text-align: center;
+    font-size: smaller;
+}
+
+td {
+    width:0.1%;
+    white-space: nowrap;
 }
