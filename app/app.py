@@ -16,7 +16,7 @@ def home():
 def mvp_predictor():
     cur_year = datetime.now().year
     # Convert DataFrame to HTML
-    df = mvp_predictions(cur_year-1, cur_year-1)
+    df = mvp_predictions(cur_year, cur_year)
     columns = df.columns.tolist()
     data = df.values.tolist()
 
@@ -26,7 +26,7 @@ def mvp_predictor():
 def mvp_predictor_year(year):
     session['selected_year'] = year
     # Convert DataFrame to HTML
-    df = mvp_predictions(year-1, year-1)
+    df = mvp_predictions(year, year)
     columns = df.columns.tolist()
     data = df.values.tolist()
 

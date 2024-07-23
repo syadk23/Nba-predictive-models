@@ -6,7 +6,7 @@ import pandas as pd
 def main():
     #pd.set_option('display.max_columns', None)
 
-    mvp_predictions(start_year=2000, end_year=2009)
+    df = mvp_predictions(start_year=1996, end_year=1996)
     #print(df)
         
     """ game_pred_model_predictions = game_prediction()

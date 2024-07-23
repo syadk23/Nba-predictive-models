@@ -69,14 +69,14 @@ def get_mvp_winners():
     return mvp_winners
 
 def mvp_predictions(start_year, end_year):
-    if start_year < 1986 or start_year > 2023:
+    if start_year < 1987 or start_year > 2024:
         print('Invalid season, there are no stats available for seasons:', start_year)
         return
-    if end_year < 1986 or end_year > 2023:
+    if end_year < 1987 or end_year > 2024:
         print('Invalid season, there are no stats available for seasons:', end_year)
         return
 
-    seasons = [f"{year}-{str(year+1)[-2:]}" for year in range(start_year, end_year + 1)]
+    seasons = [f"{year-1}-{str(year)[-2:]}" for year in range(start_year, end_year + 1)]
 
     mvp_winners = get_mvp_winners()
 
@@ -139,9 +139,12 @@ def mvp_predictions(start_year, end_year):
         df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'].apply(lambda x: round(x, 3))
         df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
 
+        # Extra work to make the dataframe more pleasing to look at on website
         hide_cols = ['PLAYER_ID', 'TEAM_ID']
         visible_cols = df_season.columns[~df_season.columns.isin(hide_cols)]
         df_season = df_season[visible_cols]
+        df_season = df_season.rename(columns={'TEAM_ABBREVIATION': 'TEAM'})
+
         return df_season
 
 
