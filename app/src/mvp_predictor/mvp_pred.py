@@ -69,10 +69,10 @@ def get_mvp_winners():
     return mvp_winners
 
 def mvp_predictions(start_year, end_year):
-    if start_year < 1987 or start_year > 2024:
+    if start_year < 1997 or start_year > 2024:
         print('Invalid season, there are no stats available for seasons:', start_year)
         return
-    if end_year < 1987 or end_year > 2024:
+    if end_year < 1997 or end_year > 2024:
         print('Invalid season, there are no stats available for seasons:', end_year)
         return
 
@@ -84,8 +84,6 @@ def mvp_predictions(start_year, end_year):
         df_basic = get_player_stats(season)
         df_advanced_stats = get_player_advanced_stats(season)
 
-        df_basic.insert(len(df_basic.columns), 'COUNTING_STATS', df_basic['PTS'] + df_basic['REB'] + df_basic['AST'])
-        df_basic['COUNTING_STATS'] = df_basic['COUNTING_STATS'].apply(lambda x: round(x, 1))
         df_basic['AGE'] = df_basic['AGE'].astype(int)
 
         removed_cols = ['WNBA_FANTASY_PTS', 'NICKNAME']
@@ -99,15 +97,20 @@ def mvp_predictions(start_year, end_year):
         selected_cols_df_advanced_stats = ['PLAYER_ID', 'PLAYER_NAME', 'TEAM_ID', 'TEAM_ABBREVIATION', 'AGE', 'GP', 'W', 'L', 'W_PCT', 'MIN', 'OFF_RATING', 'DEF_RATING', 'NET_RATING', 'TS_PCT', 'USG_PCT', 'PIE']
         df_advanced_stats = df_advanced_stats[selected_cols_df_advanced_stats]
         
-        # IF COUNTING STATS ARE < 30 or games played is < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
-        df_basic = df_basic.drop(df_basic[df_basic['COUNTING_STATS'] < 30.0].index)
-        df_basic = df_basic.drop(df_basic[df_basic['GP'] < 30].index)
 
         df_season = pd.merge(df_basic, df_advanced_stats, how='inner')
         df_season.insert(5, 'SEASON', season)
+
         df_season.insert(len(df_season.columns), 'WON_MVP', 0)
         df_season['WON_MVP'] = df_season['PLAYER_NAME'].apply(lambda str: str.upper() in mvp_winners[season]).map({True: 1, False: 0})
   
+        df_season.insert(len(df_season.columns), 'COUNTING_STATS', df_season['PTS'] + df_season['REB'] + df_season['AST'])
+        df_season['COUNTING_STATS'] = df_season['COUNTING_STATS'].apply(lambda x: round(x, 1)
+                                                                        )
+        # IF COUNTING STATS ARE < 30 or games played is < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
+        df_season = df_season.drop(df_season[df_season['COUNTING_STATS'] < 30.0].index)
+        df_season = df_season.drop(df_season[df_season['GP'] < 30].index)
+
         X, y = df_season.drop(columns=['WON_MVP', 'PLAYER_NAME', 'PLAYER_ID', 'TEAM_ID', 'TEAM_ABBREVIATION', 'SEASON']), df_season['WON_MVP']
 
         #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -132,20 +135,21 @@ def mvp_predictions(start_year, end_year):
 
         regr_seasons_predictions = regr.predict(X)
 
-        df_season['PREDICTED_PROBABILITY'] = regr_seasons_predictions * 100
-        prob_sum = df_season['PREDICTED_PROBABILITY'].sum()
+        df_season['PROBABILITY(%)'] = regr_seasons_predictions * 100
+        prob_sum = df_season['PROBABILITY(%)'].sum()
 
-        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'] / prob_sum * 100 if prob_sum > 0 else 0
-        df_season['PREDICTED_PROBABILITY'] = df_season['PREDICTED_PROBABILITY'].apply(lambda x: round(x, 3))
-        df_season.sort_values(by='PREDICTED_PROBABILITY', ascending=False, inplace=True)
+        df_season['PROBABILITY(%)'] = df_season['PROBABILITY(%)'] / prob_sum * 100 if prob_sum > 0 else 0
+        df_season['PROBABILITY(%)'] = df_season['PROBABILITY(%)'].apply(lambda x: round(x, 3))
+        df_season.sort_values(by='PROBABILITY(%)', ascending=False, inplace=True)
 
         # Extra work to make the dataframe more pleasing to look at on website
         hide_cols = ['PLAYER_ID', 'TEAM_ID']
         visible_cols = df_season.columns[~df_season.columns.isin(hide_cols)]
         df_season = df_season[visible_cols]
-        df_season = df_season.rename(columns={'TEAM_ABBREVIATION': 'TEAM'})
-
-        return df_season
+        df_season = df_season.rename(columns={'TEAM_ABBREVIATION': 'TEAM', 'W_PCT': 'W(%)', 'FG_PCT': 'FG(%)', 'FG3_PCT': 'FG3(%)', 'FT_PCT': 'FT(%)', 'TS_PCT': 'TS(%)', 'USG_PCT': 'USG(%)',
+                                              'PLUS_MINUS': '+/-', 'PLAYER_NAME': 'PLAYER', 'OFF_RATING': 'OFF_RTG', 'DEF_RATING': 'DEF_RTG', 'NET_RATING': 'NET_RTG'})
+        
+        return df_season.drop(columns={'NBA_FANTASY_PTS', 'WON_MVP'})
 
 
 
@@ -154,4 +158,4 @@ def mvp_predictions(start_year, end_year):
         #print(feat_imp)
 
         #print(df_season)
-        #print(df_season[['PLAYER_NAME', 'SEASON', 'PREDICTED_PROBABILITY', 'WON_MVP']])
+        #print(df_season[['PLAYER_NAME', 'SEASON', 'PROBABILITY(%)', 'WON_MVP']])

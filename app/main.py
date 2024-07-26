@@ -7,7 +7,7 @@ def main():
     #pd.set_option('display.max_columns', None)
 
     df = mvp_predictions(start_year=1996, end_year=1996)
-    #print(df)
+    print(df)
         
     """ game_pred_model_predictions = game_prediction()
     acc = accuracy_score(game_pred_model_predictions['actual'], game_pred_model_predictions['predictions'])
