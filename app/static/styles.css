@@ -114,3 +114,7 @@ tr:nth-child(even) {
     transition: transform 0.3s, box-shadow 0.3s;
     transform: scale(1.05);
 }
+
+#playerTable {
+    display: none; /* Table hidden by default */
+}

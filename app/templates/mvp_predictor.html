@@ -24,7 +24,13 @@
             </select>
             <br>
             <br>
-            <table>
+            <div class ="playerFace">
+                {% for i in data %}
+                {% endfor %}
+            </div>
+            <button class="button" onclick="toggleTable()">Show Table of Stats</button>
+            <br>
+            <table id="playerTable">
                 <thead>
                     <tr>
                         {% for col in columns %}
@@ -50,6 +56,19 @@
                     window.location.href = "/mvp_predictor/" + (year);
                 }
             }
-        </script>
+            
+            // JavaScript function to toggle the visibility of the table
+            function toggleTable() {
+                var table = document.getElementById("playerTable");
+                if (table.style.display === "none") {
+                    table.style.display = "table"; // Show table
+                    document.querySelector('.button').innerText = "Hide Table of Stats"; // Change button text
+                } else {
+                    table.style.display = "none"; // Hide table
+                    document.querySelector('.button').innerText = "Show Table of Stats"; // Reset button text
+                }
+            }
+            </script>
+
     </body>
 </html>

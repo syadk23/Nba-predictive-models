@@ -105,8 +105,8 @@ def mvp_predictions(start_year, end_year):
         df_season['WON_MVP'] = df_season['PLAYER_NAME'].apply(lambda str: str.upper() in mvp_winners[season]).map({True: 1, False: 0})
   
         df_season.insert(len(df_season.columns), 'COUNTING_STATS', df_season['PTS'] + df_season['REB'] + df_season['AST'])
-        df_season['COUNTING_STATS'] = df_season['COUNTING_STATS'].apply(lambda x: round(x, 1)
-                                                                        )
+        df_season['COUNTING_STATS'] = df_season['COUNTING_STATS'].apply(lambda x: round(x, 1))
+        
         # IF COUNTING STATS ARE < 30 or games played is < 30, DISREGARD PLAYER AS THERE HAS NEVER BEEN A CASE FOR THEM TO WIN MVP, ALSO HELPS LOWER THE AMOUNT OF DATA BEING USED
         df_season = df_season.drop(df_season[df_season['COUNTING_STATS'] < 30.0].index)
         df_season = df_season.drop(df_season[df_season['GP'] < 30].index)
@@ -148,6 +148,8 @@ def mvp_predictions(start_year, end_year):
         df_season = df_season[visible_cols]
         df_season = df_season.rename(columns={'TEAM_ABBREVIATION': 'TEAM', 'W_PCT': 'W(%)', 'FG_PCT': 'FG(%)', 'FG3_PCT': 'FG3(%)', 'FT_PCT': 'FT(%)', 'TS_PCT': 'TS(%)', 'USG_PCT': 'USG(%)',
                                               'PLUS_MINUS': '+/-', 'PLAYER_NAME': 'PLAYER', 'OFF_RATING': 'OFF_RTG', 'DEF_RATING': 'DEF_RTG', 'NET_RATING': 'NET_RTG'})
+        
+        df_season = df_season.drop(df_season[df_season['PROBABILITY(%)'] == 0].index)
         
         return df_season.drop(columns={'NBA_FANTASY_PTS', 'WON_MVP'})
 
