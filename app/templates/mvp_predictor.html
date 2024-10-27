@@ -18,16 +18,13 @@
             <label for="year">Year:</label>
             <select id="year" name="year" onchange="redirectToYear(this.value)">
                 <option value="" disabled>Select a year</option>
-                {% for year in range(2023, 1995, -1) %}
-                    <option value="{{ year+1 }}" {% if selected_year == year %} selected {% endif %}>{{ year }}-{{ year+1 }}</option>
+                {% for year in range(2025, 1996, -1) %}
+                    <option value="{{ year }}" {% if selected_year == year %} selected {% endif %}>{{ year-1 }}-{{ year }}</option>
                 {% endfor %}
             </select>
             <br>
             <br>
-            <div class ="playerFace">
-                {% for i in data %}
-                {% endfor %}
-            </div>
+            
             <button class="button" onclick="toggleTable()">Show Table of Stats</button>
             <br>
             <table id="playerTable">
@@ -60,7 +57,7 @@
             // JavaScript function to toggle the visibility of the table
             function toggleTable() {
                 var table = document.getElementById("playerTable");
-                if (table.style.display === "none") {
+                if (table.style.display != "table") {
                     table.style.display = "table"; // Show table
                     document.querySelector('.button').innerText = "Hide Table of Stats"; // Change button text
                 } else {

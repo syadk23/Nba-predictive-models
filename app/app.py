@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, redirect, url_for
-from src.mvp_predictor.mvp_pred import mvp_predictions
+from src.mvp_predictor.mvp_predictor import train_mvp_model, predict_season_mvp
 from datetime import datetime
 import pandas as pd
 import os
@@ -7,6 +7,8 @@ import requests
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+model, scaler = train_mvp_model(2018, 2022)
 
 def get_player_faces(year):
     nba_data_url = f'http://data.nba.net/data/10s/prod/v1/{year}/players.json'
@@ -38,24 +40,29 @@ def home():
 # Default to latest year 
 @app.route('/mvp_predictor/')
 def mvp_predictor():
+    cur_month = datetime.now().month
     cur_year = datetime.now().year
+    if cur_month > 9:
+        cur_year+=1
+
     # Convert DataFrame to HTML
-    df = mvp_predictions(cur_year, cur_year)
+    df = predict_season_mvp(model, scaler, cur_year)
     columns = df.columns.tolist()
     data = df.values.tolist()
 
-    return render_template('mvp_predictor.html', selected_year=cur_year-1, columns=columns, data=data)
+    return render_template('mvp_predictor.html', selected_year=cur_year, columns=columns, data=data)
 
 @app.route('/mvp_predictor/<int:year>')
 def mvp_predictor_year(year):
     session['selected_year'] = year
+    
     # Convert DataFrame to HTML
-    df = mvp_predictions(year, year)
+    df = predict_season_mvp(model, scaler, year)
     columns = df.columns.tolist()
     data = df.values.tolist()
     players = get_player_faces(year)
 
-    return render_template('mvp_predictor.html', selected_year=year-1, columns=columns, data=data, players=players)
+    return render_template('mvp_predictor.html', selected_year=year, columns=columns, data=data, players=players)
 
 @app.route('/game_predictor')
 def game_predictor():
