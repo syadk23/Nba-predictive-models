@@ -149,22 +149,17 @@ def predict_season_mvp(model, scaler, year):
     predictions = model.predict(X_current_scaled)
 
     # Normalize the probabilities and add to DataFrame
-    df_current['PROBABILITY(%)'] = (predictions / predictions.sum()) * 100
-    df_current['PROBABILITY(%)'] = df_current['PROBABILITY(%)'].round(3)
+    df_current['PROB(%)'] = (predictions / predictions.sum()) * 100
+    df_current['PROB(%)'] = df_current['PROB(%)'].round(3)
     
-    # Sort players by highest MVP probability
-    df_current.sort_values(by='PROBABILITY(%)', ascending=False, inplace=True)
+    # Sort players by highest MVP PROB
+    df_current.sort_values(by='PROB(%)', ascending=False, inplace=True)
 
     # Extra work to make the dataframe more pleasing to look at on website
-    hide_cols = ['PLAYER_ID', 'TEAM_ID']
-    visible_cols = df_current.columns[~df_current.columns.isin(hide_cols)]
-    df_current = df_current[visible_cols]
     df_current = df_current.rename(columns={'TEAM_ABBREVIATION': 'TEAM', 'W_PCT': 'W(%)', 'FG_PCT': 'FG(%)', 'FG3_PCT': 'FG3(%)', 'FT_PCT': 'FT(%)', 'TS_PCT': 'TS(%)', 'USG_PCT': 'USG(%)',
                                             'PLUS_MINUS': '+/-', 'PLAYER_NAME': 'PLAYER', 'OFF_RATING': 'OFF_RTG', 'DEF_RATING': 'DEF_RTG', 'NET_RATING': 'NET_RTG'})
     
-    df_current.insert(5, 'SEASON', season)
-    df_current['MVP'] = df_current['PLAYER'].apply(lambda name: 1 if name.upper() == mvp_winners.get(season, "").upper() else 0)
-    #df_current['COUNTING_STATS'].round(1)
-    df_current.drop(columns={'NBA_FANTASY_PTS'})
+    #df_current['MVP'] = df_current['PLAYER'].apply(lambda name: 1 if name.upper() == mvp_winners.get(season, "").upper() else 0)
+    df_current = df_current.drop(columns={'PLAYER_ID', 'TEAM_ID', 'NBA_FANTASY_PTS', 'COUNTING_STATS', 'BLKA', 'PF', 'PFD'})
 
-    return df_current.head(10)
+    return df_current.head(10) # Return the top 10 candidates

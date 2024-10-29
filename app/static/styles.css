@@ -1,120 +1,172 @@
+/* Base Styling */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background-color: #f5f5f5;
+    background-color: #f8f9fa;
     color: #333;
+    display: flex;
 }
 
+/* Vertical Navbar Styling */
 .navbar {
-    width: 100%;
-    height: 60px;
+    width: 220px; /* Fixed width for sidebar */
+    height: 100vh;
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
     align-items: center;
-    background-color: #003366;
-    padding: 0 20px;
+    background-color: #001f3f;
     box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .navbar a {
-    color: #f2f2f2;
+    color: #f1f1f1;
+    padding: 30px 20px;
+    width: 100%;
     text-align: center;
-    padding: 15px;
     text-decoration: none;
-    font-size: 18px;
-    transition: background-color 0.3s, color 0.3s;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .navbar a:hover {
-    background-color: #00509e;
-    color: #fff;
+    background-color: #0074d9;
+    color: #ffffff;
     font-weight: bold;
+    border-radius: 10px;
 }
 
+/* Content Styling */
 .content {
-    margin-top: 80px; /* Adjust to ensure content is not hidden behind the navbar */
-    padding: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 240px; /* Leave space for the vertical navbar */
+    padding: 20px 40px; /* Add padding for a centered look */
 }
 
 h1 {
-    font-size: 36px;
-    color: #00509e;
-    margin-bottom: 20px;
+    font-size: 30px;
+    color: #004080;
+    font-weight: bold;
+    margin-bottom: 25px;
 }
 
-p {
-    font-size: 18px;
-    margin-bottom: 20px;
+p, label {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
-label {
-    font-size: 18px;
-    margin-right: 10px;
-}
-
+/* Form and Select */
 select {
     font-size: 16px;
-    padding: 5px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #333;
 }
 
+/* Table Styling */
 .table-container {
-    flex: 1; /* Allow the container to take available space */
-    max-height: calc(100vh - 80px); /* Adjust based on navbar height */
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: auto;
     width: 100%;
-    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 table {
-    width: 90%;
+    width: 60%;
     border-collapse: collapse;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: #ffffff;
 }
 
 table, th, td {
     border: 1px solid #ddd;
-    font-size: 12px; /* Smaller font size */
+    font-size: 12px;
 }
 
 th, td {
-    padding: 5px; /* Adjust padding to match smaller text */
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-    color: #00509e;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.bottom {
-    position: fixed;
-    bottom: 0px;
-    width: 100%;
+    padding: 5px;
     text-align: center;
 }
 
+th {
+    background-color: #004080;
+    color: #ffffff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f3f6fa;
+}
+
+tr:hover {
+    background-color: #e6f2ff;
+}
+
+/* Button Styling */
+button {
+    background-color: #0074d9;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    margin: 15px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #005bb5;
+    transform: scale(1.05);
+}
+
+/* Bottom Footer */
+.bottom {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    color: #ffffff;
+    text-align: center;
+    font-size: 14px;
+    margin-left: 240px; /* Leave space for the vertical navbar */
+    padding: 20px 40px; /* Add padding for a centered look */
+    width: calc(100% - 240px); /* Adjust width to prevent overflow */
+
+}
+
+/* Home Image Styling */
 .home-image {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    opacity: 1;
     gap: 20px;
-    border-radius: 10px;
+    margin-top: 20px;
     transition: transform 0.3s, box-shadow 0.3s;
-    transform: scale(1.05);
+    
 }
 
+.home-image img {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.home-image img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Hidden Player Table */
 #playerTable {
     display: none; /* Table hidden by default */
 }

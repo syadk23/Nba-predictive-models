@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>NBA Machine Learning Model Predictors</title>
+        <title>NBA ML Predictions</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     </head>
     <body>
@@ -11,17 +11,15 @@
             <a href="{{ url_for('home') }}">Home</a>
             <a href="{{ url_for('mvp_predictor') }}">MVP Predictor</a>
             <a href="{{ url_for('game_predictor') }}">Game Predictor</a>
+            <a href="{{ url_for('info') }}">Info</a>
         </div>
 
         <div class="content">
-            <center>
                 <h1>Welcome to Syad's NBA Game/Award Predictor Site</h1>
                 <p>Please select an option from the navigation bar to get started.</p>
-            </center>
         </div>
 
         <div class="home-image">
-            <img src="{{ url_for('static', filename='images/basketball1.png') }}" alt="Basketball Image 1">
         </div>
 
         <div class="bottom">

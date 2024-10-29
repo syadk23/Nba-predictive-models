@@ -11,6 +11,7 @@
         <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('mvp_predictor') }}">MVP Predictor</a>
         <a href="{{ url_for('game_predictor') }}">Game Predictor</a>
+        <a href="{{ url_for('info') }}">Info</a>
         </div>
 
         <div class="content">
@@ -22,7 +23,6 @@
                     <option value="{{ year }}" {% if selected_year == year %} selected {% endif %}>{{ year-1 }}-{{ year }}</option>
                 {% endfor %}
             </select>
-            <br>
             <br>
             
             <button class="button" onclick="toggleTable()">Show Table of Stats</button>

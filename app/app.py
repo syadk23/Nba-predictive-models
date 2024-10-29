@@ -55,7 +55,7 @@ def mvp_predictor():
 @app.route('/mvp_predictor/<int:year>')
 def mvp_predictor_year(year):
     session['selected_year'] = year
-    
+
     # Convert DataFrame to HTML
     df = predict_season_mvp(model, scaler, year)
     columns = df.columns.tolist()
@@ -66,7 +66,11 @@ def mvp_predictor_year(year):
 
 @app.route('/game_predictor')
 def game_predictor():
-    return "<h1>Game Predictor Page</h1>"
+    return render_template('game_predictor.html')
+
+@app.route('/info')
+def info():
+    return render_template('info.html')
         
 if __name__ == '__main__':
     app.run(debug=True)
