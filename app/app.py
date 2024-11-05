@@ -1,13 +1,15 @@
 from flask import Flask, render_template, session, redirect, url_for
 from src.mvp_predictor.mvp_predictor import train_mvp_model, predict_season_mvp
 from datetime import datetime
+from joblib import dump, load
 import pandas as pd
 import os
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-model, scaler = train_mvp_model(2018, 2022)
+model = load('models/model_last_10_years.joblib')
+scaler = load('models/scaler.joblib')
 
 @app.route('/')
 def home():
