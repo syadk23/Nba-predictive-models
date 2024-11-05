@@ -53,7 +53,7 @@ h1 {
     margin-bottom: 25px;
 }
 
-p, label {
+label {
     font-size: 16px;
     color: #555;
     margin-bottom: 10px;
@@ -133,11 +133,10 @@ button:hover {
 /* Bottom Footer */
 .bottom {
     bottom: 0;
-    left: 0;
     position: fixed;
     color: #ffffff;
-    text-align: center;
-    font-size: 14px;
+    color: #555;
+    font-size: 12px;
     margin-left: 240px; /* Leave space for the vertical navbar */
     padding: 20px 40px; /* Add padding for a centered look */
     width: calc(100% - 240px); /* Adjust width to prevent overflow */

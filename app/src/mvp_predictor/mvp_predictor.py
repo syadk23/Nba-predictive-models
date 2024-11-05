@@ -125,7 +125,6 @@ def predict_season_mvp(model, scaler, year):
     # Load season data
     df_basic = get_player_stats(season)
     df_advanced = get_player_advanced_stats(season)
-    mvp_winners = get_mvp_winners()
 
     # Remove unnecessary columns
     cols_to_remove = ['WNBA_FANTASY_PTS', 'NICKNAME'] + [col for col in df_basic.columns if 'RANK' in col]
@@ -161,5 +160,6 @@ def predict_season_mvp(model, scaler, year):
     
     #df_current['MVP'] = df_current['PLAYER'].apply(lambda name: 1 if name.upper() == mvp_winners.get(season, "").upper() else 0)
     df_current = df_current.drop(columns={'PLAYER_ID', 'TEAM_ID', 'NBA_FANTASY_PTS', 'COUNTING_STATS', 'BLKA', 'PF', 'PFD'})
+    df_current.insert(0, 'RANK', range(1, len(df_current.index)+1))
 
     return df_current.head(10) # Return the top 10 candidates

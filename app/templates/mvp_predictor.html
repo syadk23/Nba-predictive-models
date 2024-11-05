@@ -24,8 +24,13 @@
                 {% endfor %}
             </select>
             <br>
-            
-            <button class="button" onclick="toggleTable()">Show Table of Stats</button>
+            <!-- <div class = "mvp-content">
+                <p>Top 10 Candidates</p>
+                {% for row in data %}
+                    <p>{{ row[0] }}. {{ row[1] }}</p>
+                {% endfor %}
+            </div> -->
+            <button class="button" onclick="toggleTable()">Show Stats for Top 10</button>
             <br>
             <table id="playerTable">
                 <thead>
@@ -53,19 +58,21 @@
                     window.location.href = "/mvp_predictor/" + (year);
                 }
             }
-            
             // JavaScript function to toggle the visibility of the table
             function toggleTable() {
                 var table = document.getElementById("playerTable");
                 if (table.style.display != "table") {
                     table.style.display = "table"; // Show table
-                    document.querySelector('.button').innerText = "Hide Table of Stats"; // Change button text
+                    document.querySelector('.button').innerText = "Hide Table"; // Change button text
                 } else {
                     table.style.display = "none"; // Hide table
-                    document.querySelector('.button').innerText = "Show Table of Stats"; // Reset button text
+                    document.querySelector('.button').innerText = "Show Stats for Top 10"; // Reset button text
                 }
             }
             </script>
 
+        <div class="bottom">
+            <p>&copy 2024, Created by Syad Khwajazada</p>
+        </div>
     </body>
 </html>
